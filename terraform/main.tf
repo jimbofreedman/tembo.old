@@ -21,9 +21,9 @@ variable "backend_domain" {}
 
 terraform {
   backend "s3" {
-    bucket         = "changeme-terraform"
-    key            = "changeme.tfstate"
-    region         = "eu-central-1"
+    bucket         = "template-terraform"
+    key            = "template.tfstate"
+    region         = "eu-west-1"
     encrypt        = true
     dynamodb_table = "terraform-lock"
   }
@@ -36,7 +36,7 @@ provider "aws" {
 }
 
 resource "heroku_app" "backend" {
-  name   = "changeme-backend-${terraform.workspace}"
+  name   = "template-backend-${terraform.workspace}"
   region = "eu"
   acm    = "true"
 
@@ -45,7 +45,7 @@ resource "heroku_app" "backend" {
   //
 
   buildpacks = [
-    "heroku/nodejs"
+    "heroku/python"
   ]
 }
 
