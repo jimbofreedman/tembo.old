@@ -8,6 +8,7 @@ import api from '../api';
 class ApiSerice {
   constructor() {
     this.api_url = Constants.manifest.extra.apiUrl;
+    console.log("API URL", this.api_url)
   }
 
   /**
@@ -27,6 +28,7 @@ class ApiSerice {
       payload.body = JSON.stringify(params);
     }
     console.log(payload);
+    console.log(`${this.api_url}${url}`);
     const res = await fetch(`${this.api_url}${url}`, payload);
     const { status } = res;
     const body = await res.json();
