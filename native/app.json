@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "template",
-    "slug": "template",
+    "name": "tembo",
+    "slug": "tembo",
     "privacy": "unlisted",
     "sdkVersion": "36.0.0",
     "platforms": [
@@ -12,7 +12,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "freedmaniotemplate",
+    "scheme": "tembo",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -25,11 +25,11 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "io.freedman.template.app",
+      "bundleIdentifier": "io.freedman.tembo.app",
       "buildNumber": "1.0.0"
     },
     "android": {
-      "package": "io.freedman.template.app",
+      "package": "io.freedman.tembo.app",
       "versionCode": 1
     }
   }

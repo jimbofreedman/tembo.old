@@ -4,16 +4,10 @@ import Constants from 'expo-constants';
 
 import { observable, action, computed } from 'mobx';
 
-import apiService from '../services/apiService';
-
 export default class AuthStore {
-  @observable facebookId = null;
+  httpClient = null;
 
   @observable facebookToken = null;
-
-  @observable facebookExpires = null;
-
-  @observable facebookName = null;
 
   @observable apiToken = null;
 
@@ -21,7 +15,9 @@ export default class AuthStore {
     return this.apiToken !== null;
   }
 
-  constructor() {
+  constructor(httpClient) {
+    this.httpClient = httpClient;
+
     Facebook.setAutoInitEnabledAsync(true).then(() => {
       SecureStore.getItemAsync('apiToken').then(t => {
         this.apiToken = t;
@@ -34,17 +30,11 @@ export default class AuthStore {
   }
 
   @action.bound async checkLoggedIn() {
-    apiService
-      .me(this.apiToken)
-      .then(() => {
-        console.log('logged in');
-        return true;
-      })
-      .catch(() => {
-        console.log('not logged in');
-        this.logout();
-        return false;
-      });
+    this.httpClient
+        .get(`${Constants.manifest.extra.apiUrl}/api/users/me`)
+        .then((data) => console.log(data))
+        .catch((error) => console.log(error));
+    return false;
   }
 
   @action.bound
@@ -68,7 +58,8 @@ export default class AuthStore {
           token,
         };
 
-        const apiToken = await apiService.convertToken(params);
+        //const apiToken = await apiService.convertToken(params);
+        const apiToken = await this.httpClient.post(`${Constants.manifest.extra.apiUrl}/auth/convert-token`, params);
         this.apiToken = apiToken.accessToken;
         this.facebookToken = token;
         SecureStore.setItemAsync('apiToken', this.apiToken);

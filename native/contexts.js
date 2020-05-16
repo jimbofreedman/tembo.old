@@ -5,7 +5,6 @@ import Constants from 'expo-constants';
 
 import AuthStore from './stores/authStore';
 
-const authStore = new AuthStore();
 
 console.log('API:', Constants.manifest.extra.apiUrl);
 
@@ -17,10 +16,14 @@ const httpClient = axios.create({
   },
 });
 
-httpClient.interceptors.request.use(request => {
-  console.log('Request:', request);
-  return request;
-});
+const authStore = new AuthStore(httpClient);
+
+if (__DEV__) {
+  httpClient.interceptors.request.use(request => {
+    console.log('Request:', request);
+    return request;
+  });
+}
 
 httpClient.interceptors.request.use(config => {
   const finalChar = config.url[config.url.length - 1];
