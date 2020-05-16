@@ -13,19 +13,27 @@
 // TF_VAR_root_domain
 
 
-variable "aws_region" {}
+variable "aws_region" {
+  default = "eu-west-1"
+}
 
-variable "root_domain" {}
-variable "cert_domain" {}
-variable "backend_domain" {}
+variable "root_domain" {
+  default = "freedman.io"
+}
+variable "cert_domain" {
+  default = "backend.tembo.freedman.io"
+}
+variable "backend_domain" {
+  default = "backend.tembo.freedman.io"
+}
 
 terraform {
   backend "s3" {
-    bucket         = "tembo-terraform"
+    bucket         = "freedmanio-terraform"
     key            = "tembo.tfstate"
     region         = "eu-west-1"
     encrypt        = true
-    dynamodb_table = "tembo-lock"
+    dynamodb_table = "terraform-lock"
   }
 }
 
@@ -38,7 +46,7 @@ provider "aws" {
 resource "heroku_app" "backend" {
   name   = "tembo-backend-${terraform.workspace}"
   region = "eu"
-  acm    = "true"
+  // acm    = "true"
 
   //  config_vars = {
   //    FOOBAR = "baz"
@@ -51,8 +59,14 @@ resource "heroku_app" "backend" {
 
 resource "heroku_addon" "database" {
   app  = heroku_app.backend.name
-  plan = "postgres:sandbox"
+  plan = "heroku-postgresql:hobby-dev"
 }
+
+resource "heroku_addon" "sentry" {
+  app  = heroku_app.backend.name
+  plan = "sentry:f1"
+}
+
 
 // Can't use Terraform for this because we want to share the same add-on across all environments
 //resource "heroku_addon" "logging" {
@@ -131,21 +145,21 @@ provider "aws" {
 //  }
 //}
 
-data "aws_route53_zone" "zone" {
-  name         = var.root_domain
-  private_zone = false
-}
-
-resource "aws_route53_record" "backend_record" {
-  zone_id = data.aws_route53_zone.zone.zone_id
-  name    = var.backend_domain
-  type    = "CNAME"
-  records = [heroku_domain.backend.cname]
-  ttl     = 60
-
-  //  alias {
-  //    name = aws_cloudfront_distribution.backend_cloudfront_distribution.domain_name
-  //    zone_id = aws_cloudfront_distribution.backend_cloudfront_distribution.hosted_zone_id
-  //    evaluate_target_health = false
-  //  }
-}
+//data "aws_route53_zone" "zone" {
+//  name         = var.root_domain
+//  private_zone = false
+//}
+//
+//resource "aws_route53_record" "backend_record" {
+//  zone_id = data.aws_route53_zone.zone.zone_id
+//  name    = var.backend_domain
+//  type    = "CNAME"
+//  records = [heroku_domain.backend.cname]
+//  ttl     = 60
+//
+//  //  alias {
+//  //    name = aws_cloudfront_distribution.backend_cloudfront_distribution.domain_name
+//  //    zone_id = aws_cloudfront_distribution.backend_cloudfront_distribution.hosted_zone_id
+//  //    evaluate_target_health = false
+//  //  }
+//}
